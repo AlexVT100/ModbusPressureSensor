@@ -1,0 +1,96 @@
+input_boolean:
+    boiler_pressure_sensor_enable_notifications:
+      name: Enable out-of-limit notifcations
+
+#==============================================================================================
+# Notification Groups
+#==============================================================================================
+#
+notify:
+  - platform: group
+    name: all_apps
+    unique_id: all_apps
+    services:
+      - action: persistent_notification
+      #- action: mobile_app_sm_a505fm
+
+#==============================================================================================
+# Sensor status notification
+#==============================================================================================
+#
+script:
+  boiler_pressure_sensor_notification:
+    description: "Boiler pressure notification"
+    sequence:
+      - if:
+          - alias: "If pressure is too low"
+            condition: state
+            entity_id: sensor.boiler_pressure_status
+            state: "Pressure too low"
+        then:
+          - action: notify.notify
+            data:
+              message: >-
+                The current pressure {{ states('sensor.boiler_pressure_sensor_pressure') }} bar
+                is below the threshold of {{ states('sensor.boiler_pressure_sensor_low_threshold') }} bar.
+              data:
+                ttl: 0
+                priority: high
+
+      - if:
+          - alias: "If pressure is too high"
+            condition: state
+            entity_id: sensor.boiler_pressure_status
+            state: "Pressure too high"
+        then:
+          - action: notify.notify
+            data:
+              message: >-
+                The current pressure {{ states('sensor.boiler_pressure_sensor_pressure') }} bar
+                is above the threshold of {{ states('sensor.boiler_pressur_sensor_high_threshold') }} bar.
+              data:
+                ttl: 0
+                priority: high
+
+      - if:
+          - alias: "If sensor failed"
+            condition: state
+            entity_id: sensor.boiler_pressure_raw_status
+            state: "Failure"
+        then:
+          - action: notify.notify
+            data:
+              message: "Boiler pressure sensor failed"
+              data:
+                ttl: 0
+                priority: high
+
+      - if:
+          - alias: "If pressure is normal"
+            condition: state
+            entity_id: sensor.boiler_pressure_raw_status
+            state: "Normal"
+        then:
+          - action: notify.notify
+            data:
+              title: "Pressure Back to Normal"
+              message: "Boiler pressure is back to normal ({{ states('sensor.boiler_pressure_sensor_pressure') }} bar)"
+
+automation:
+  - id: boiler_pressure_sensor_status_notification
+    alias: Boiler pressure notification
+    description: ''
+    triggers:
+    - trigger: state
+      entity_id: sensor.boiler_pressure_sensor_status
+    conditions:
+    - condition: state
+      entity_id: input_boolean.boiler_pressure_sensor_enable_notifications
+      state:
+      - 'on'
+    actions:
+    - action: script.turn_on
+      metadata: {}
+      target:
+        entity_id: script.boiler_pressure_sensor_notification
+    mode: single

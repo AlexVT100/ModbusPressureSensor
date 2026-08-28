@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="300mm"
+   height="100mm"
+   viewBox="0 0 300 100"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="brand.svg"
+   inkscape:version="1.4.4 (unknown)"
+   inkscape:export-filename="../hass/custom_components/modbus_pressure_sensor/brand/logo.png"
+   inkscape:export-xdpi="32.509998"
+   inkscape:export-ydpi="32.509998"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showguides="true"
+     showgrid="true"
+     inkscape:zoom="1.0129245"
+     inkscape:cx="263.09957"
+     inkscape:cy="235.95046"
+     inkscape:window-width="1861"
+     inkscape:window-height="1012"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer10">
+    <inkscape:grid
+       id="grid1"
+       units="mm"
+       originx="50"
+       originy="50"
+       spacingx="0.99999999"
+       spacingy="0.99999999"
+       empcolor="#0099e5"
+       empopacity="0.30196078"
+       color="#0099e5"
+       opacity="0.14901961"
+       empspacing="10"
+       enabled="true"
+       visible="true" />
+    <inkscape:grid
+       type="axonomgrid"
+       id="grid6"
+       units="mm"
+       originx="50"
+       originy="50"
+       spacingx="0.99999999"
+       spacingy="0.99999999"
+       empcolor="#0099e5"
+       empopacity="0.30196078"
+       color="#0099e5"
+       opacity="0.14901961"
+       empspacing="10"
+       dotted="false"
+       gridanglex="45"
+       gridanglez="45"
+       enabled="false"
+       visible="true"
+       snapvisiblegridlinesonly="true" />
+    <sodipodi:guide
+       position="100,19.999999"
+       orientation="1,0"
+       id="guide1"
+       inkscape:locked="false" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Bg"
+     inkscape:groupmode="layer"
+     id="layer1"
+     style="display:inline" />
+  <g
+     inkscape:groupmode="layer"
+     id="layer6"
+     inkscape:label="Logo"
+     transform="matrix(0.94179535,0,0,0.94179535,2.9102329,-0.68842383)">
+    <g
+       inkscape:groupmode="layer"
+       id="layer8"
+       inkscape:label="base"
+       style="display:inline">
+      <circle
+         style="fill:#1378c0;fill-opacity:1;stroke:none;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+         id="path3"
+         cx="50"
+         cy="77.503212"
+         r="10.048844"
+         inkscape:export-filename="../hass/custom_components/modbus_pressure_sensor/brand/icon@2x.png"
+         inkscape:export-xdpi="65.024002"
+         inkscape:export-ydpi="65.024002" />
+      <path
+         style="fill:none;stroke:#1378c0;stroke-width:12.6933;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+         id="path6"
+         sodipodi:type="arc"
+         sodipodi:cx="50"
+         sodipodi:cy="77.503212"
+         sodipodi:rx="44.876114"
+         sodipodi:ry="44.876114"
+         sodipodi:start="3.9269908"
+         sodipodi:end="5.4977871"
+         sodipodi:open="true"
+         sodipodi:arc-type="arc"
+         d="m 18.267795,45.771008 a 44.876114,44.876114 0 0 1 63.464408,-2e-6" />
+      <path
+         style="fill:none;stroke:#1378c0;stroke-width:12.6933;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+         id="path8"
+         sodipodi:type="arc"
+         sodipodi:cx="50"
+         sodipodi:cy="77.503212"
+         sodipodi:rx="64.821053"
+         sodipodi:ry="64.821053"
+         sodipodi:start="3.9269908"
+         sodipodi:end="5.4977871"
+         sodipodi:open="true"
+         sodipodi:arc-type="arc"
+         d="m 4.1645934,31.667807 a 64.821053,64.821053 0 0 1 91.6708106,-3e-6" />
+    </g>
+    <g
+       inkscape:groupmode="layer"
+       id="layer10"
+       inkscape:label="scale"
+       style="display:inline">
+      <path
+         style="fill:none;stroke:#bf4730;stroke-width:12.6933;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+         id="path7"
+         sodipodi:type="arc"
+         sodipodi:cx="50"
+         sodipodi:cy="77.503212"
+         sodipodi:rx="23.684612"
+         sodipodi:ry="23.684612"
+         sodipodi:start="2.3561945"
+         sodipodi:end="5.4977871"
+         sodipodi:open="true"
+         sodipodi:arc-type="arc"
+         d="m 33.25245,94.250762 a 23.684612,23.684612 0 0 1 0,-33.4951 23.684612,23.684612 0 0 1 33.495099,-10e-7" />
+      <path
+         style="fill:none;stroke:#1e991e;stroke-width:12.6933;stroke-linecap:butt;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+         id="path10"
+         sodipodi:type="arc"
+         sodipodi:cx="50"
+         sodipodi:cy="77.503212"
+         sodipodi:rx="23.684612"
+         sodipodi:ry="23.684612"
+         sodipodi:start="2.8797933"
+         sodipodi:end="4.9741884"
+         sodipodi:open="true"
+         sodipodi:arc-type="arc"
+         d="m 27.122421,83.63324 a 23.684612,23.684612 0 0 1 6.13003,-22.877579 23.684612,23.684612 0 0 1 22.877578,-6.130028" />
+      <path
+         style="baseline-shift:baseline;display:inline;overflow:visible;opacity:1;vector-effect:none;fill:none;stroke:#404040;stroke-width:1.05777;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;paint-order:fill markers stroke;enable-background:accumulate;stop-color:#000000;stop-opacity:1"
+         d="m 50.000001,47.742461 c -7.698956,0 -15.39658,2.918163 -21.233969,8.755552 -11.674776,11.674777 -11.674777,30.795227 0,42.470004 a 6.3466387,6.3466387 0 0 0 8.974544,0 6.3466387,6.3466387 0 0 0 0,-8.974544 c -6.824055,-6.824056 -6.824055,-17.69686 0,-24.520917 6.824056,-6.824056 17.694794,-6.824055 24.518851,0 a 6.3466387,6.3466387 0 0 0 8.976609,0 6.3466387,6.3466387 0 0 0 0,-8.974543 C 65.398648,50.660624 57.698957,47.742461 50.000001,47.742461 Z"
+         id="path16" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:29.7304px;line-height:1.25;font-family:Xolonium;-inkscape-font-specification:'Xolonium, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:end;text-anchor:end;display:inline;fill:#404040;fill-opacity:1;stroke-width:0;stroke-dasharray:none"
+         x="314.32669"
+         y="31.657408"
+         id="text1"><tspan
+           sodipodi:role="line"
+           id="tspan7"
+           x="314.32669"
+           y="31.657408"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:31.8541px;font-family:Xolonium;-inkscape-font-specification:Xolonium;letter-spacing:0.56187px;fill:#404040;fill-opacity:1"
+           dx="0 0 0 0 0"
+           dy="0">MODBUS</tspan><tspan
+           sodipodi:role="line"
+           x="314.32669"
+           y="69.531853"
+           id="tspan9" /><tspan
+           sodipodi:role="line"
+           id="tspan8"
+           x="314.32669"
+           y="106.69485" /></text>
+      <text
+         xml:space="preserve"
+         style="font-weight:bold;font-size:31.8541px;line-height:1.25;font-family:Xolonium;-inkscape-font-specification:'Xolonium, Bold';text-align:end;letter-spacing:0.56187px;text-anchor:end;display:inline;fill:#404040;fill-opacity:1;stroke-width:0.280935"
+         x="314.32669"
+         y="96.489243"
+         id="text10"><tspan
+           sodipodi:role="line"
+           id="tspan10"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:31.8541px;font-family:Xolonium;-inkscape-font-specification:Xolonium;letter-spacing:0.56187px;fill:#404040;fill-opacity:1;stroke-width:0.280935"
+           x="314.88858"
+           y="96.489243">SENSOR</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-weight:bold;font-size:31.8541px;line-height:1.25;font-family:Xolonium;-inkscape-font-specification:'Xolonium, Bold';text-align:end;text-anchor:end;display:inline;stroke-width:0.280935;fill:#404040;fill-opacity:1"
+         x="315.45044"
+         y="64.439079"
+         id="text11"><tspan
+           sodipodi:role="line"
+           id="tspan11"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:31.8541px;font-family:Xolonium;-inkscape-font-specification:Xolonium;fill:#404040;fill-opacity:1;stroke-width:0.280935"
+           x="315.45044"
+           y="64.439079">PRESSURE</tspan></text>
+    </g>
+    <g
+       inkscape:groupmode="layer"
+       id="layer9"
+       inkscape:label="needle"
+       style="display:inline">
+      <path
+         style="fill:none;stroke:#ffffff;stroke-width:4.44265;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+         d="M 50.000004,77.50321 35.191176,56.123421"
+         id="path13"
+         sodipodi:nodetypes="cc" />
+      <path
+         style="fill:none;stroke:#404040;stroke-width:3.17332;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+         d="M 50.000004,77.50321 35.191176,56.123421"
+         id="path12"
+         sodipodi:nodetypes="cc" />
+    </g>
+    <rect
+       style="fill:none;stroke:none;stroke-width:0;stroke-linejoin:round;paint-order:fill markers stroke"
+       id="rect1"
+       width="106.18018"
+       height="106.18018"
+       x="-3.0900905"
+       y="0.73096967"
+       ry="0.00014635696" />
+  </g>
+</svg>

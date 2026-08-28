@@ -1,0 +1,60 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Датчик давления Modbus",
+        "description": "Настройка подключения к датчику",
+        "data": {
+          "host": "Хост",
+          "port": "Порт",
+          "unit_id": "Номер устройства"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Невозможно подключиться к датчику по Modbus"
+    },
+    "abort": {
+      "already_configured": "Этот датчик уже сконфигурирован"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Датчик давления Modbus",
+        "data": {
+          "scan_interval": "Интервал опроса"
+        }
+      }
+    }
+  },
+  "device": {
+    "modbus_pressure_sensor": {
+      "name": "Датчик давления Modbus"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "pressure": {
+        "name": "Давление"
+      },
+      "status": {
+        "name": "Статус",
+        "state": {
+          "normal": "Норма",
+          "pressure_too_low": "Давление слишком низкое",
+          "pressure_too_high": "Давление слишком высокое",
+          "sensor_fault": "Отказ датчика"
+        }
+      }
+    },
+    "number": {
+      "low_threshold": {
+        "name": "Нижний порог"
+      },
+      "high_threshold": {
+        "name": "Верхний порог"
+      }
+    }
+  }
+}

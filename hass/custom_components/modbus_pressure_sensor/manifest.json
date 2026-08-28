@@ -1,0 +1,11 @@
+{
+  "domain": "modbus_pressure_sensor",
+  "name": "Modbus Pressure Sensor",
+  "version": "1.0.0",
+  "documentation": "https://github.com/AlexVT100/ModbusPressureSensor",
+  "codeowners": [],
+  "config_flow": true,
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "requirements": ["modbus-connection[pymodbus]>=4.6.1,<5.0"]
+}

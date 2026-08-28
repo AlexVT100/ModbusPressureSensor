@@ -1,0 +1,16 @@
+# https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+IndentWidth: 4
+ColumnLimit: 120
+TabWidth: 4
+IndentPPDirectives: AfterHash
+AlignConsecutiveMacros: AcrossEmptyLinesAndComments
+AllowShortBlocksOnASingleLine: true
+AllowShortEnumsOnASingleLine: false
+AllowShortLoopsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: WithoutElse
+NamespaceIndentation: All
+IndentCaseLabels: true
+BreakTemplateDeclarations: Leave
+PackConstructorInitializers: NextLineOnly
+BreakConstructorInitializers: AfterColon

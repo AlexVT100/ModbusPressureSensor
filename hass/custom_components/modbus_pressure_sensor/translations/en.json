@@ -1,0 +1,60 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Modbus Pressure Sensor",
+        "description": "Configure the connection to the Modbus pressure sensor.",
+        "data": {
+          "host": "Host",
+          "port": "Port",
+          "unit_id": "Unit ID"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Unable to connect to the Modbus pressure sensor."
+    },
+    "abort": {
+      "already_configured": "This Modbus pressure sensor is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Modbus Pressure Sensor",
+        "data": {
+          "scan_interval": "Scan interval"
+        }
+      }
+    }
+  },
+  "device": {
+    "modbus_pressure_sensor": {
+      "name": "Modbus Pressure Sensor"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "pressure": {
+        "name": "Pressure"
+      },
+      "status": {
+        "name": "Status",
+        "state": {
+          "normal": "Normal",
+          "pressure_too_low": "Pressure too low",
+          "pressure_too_high": "Pressure too high",
+          "sensor_fault": "Sensor fault"
+        }
+      }
+    },
+    "number": {
+      "low_threshold": {
+        "name": "Low threshold"
+      },
+      "high_threshold": {
+        "name": "High threshold"
+      }
+    }
+  }
+}
