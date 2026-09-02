@@ -43,6 +43,7 @@ class FileConfig {
     FileConfig();
     bool load();
     bool save(bool force = false);
+    bool reset();
     bool remove();
     String print();
 

@@ -46,7 +46,7 @@ void TelnetServer::setup() {
     addStandardTerminalCommands(TERM_CMD);
     TERM_CMD->addCmd("exit", "", "Close the session", _cmdExitFunc);
     TERM_CMD->addCmd("restart", "", "Restart the device", _cmdRestartFunc);
-    TERM_CMD->addCmd("config", "[save|reset]", "Show/save/remove config file", cmdConfig);
+    TERM_CMD->addCmd("config", "[save|reset|remove]", "Show/save/reset/remove config file", cmdConfig);
     TERM_CMD->addCmd("min-in", "[N]", "Get/set minimum acceptable ADC value for serviceable sensor", cmdMinADC);
     TERM_CMD->addCmd("scale-in", "[min|max [N]]", "Get/set scaler ADC values (input)", cmdScalerADC);
     TERM_CMD->addCmd("scale-out", "[min|max [N]]", "Get/set scaler pressure values (output)", cmdScalerPress);
@@ -275,7 +275,7 @@ void TelnetServer::cmdRestart(OutputInterface *terminal) {
 //-----------------------------------------------------------------------------
 //
 STATIC void TelnetServer::cmdConfig(OutputInterface *term) {
-    switch (_readParam(term, {"", "save", "reset"})) {
+    switch (_readParam(term, {"", "save", "reset", "remove"})) {
         case 0: // no parameter
             term->println(Conf.print());
             term->println();
@@ -296,6 +296,9 @@ STATIC void TelnetServer::cmdConfig(OutputInterface *term) {
             Conf.save(true);
             break;
         case 2: // reset
+            Conf.reset();
+            break;
+        case 3: // remove
             Conf.remove();
     }
     term->prompt();

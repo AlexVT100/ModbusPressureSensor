@@ -4,7 +4,7 @@
 extern TerminalLogger Logger;
 
 //-----------------------------------------------------------------------------
-//
+// Default constructor
 //-----------------------------------------------------------------------------
 //
 FileConfig::FileConfig() {
@@ -19,7 +19,7 @@ FileConfig::FileConfig() {
 }
 
 //-----------------------------------------------------------------------------
-//
+// (Re)set the configuration to default values
 //-----------------------------------------------------------------------------
 //
 void FileConfig::_setDefaults() {
@@ -28,7 +28,7 @@ void FileConfig::_setDefaults() {
 }
 
 //-----------------------------------------------------------------------------
-//
+// Load the configuration from the file
 //-----------------------------------------------------------------------------
 //
 bool FileConfig::load() {
@@ -80,7 +80,7 @@ bool FileConfig::load() {
 }
 
 //-----------------------------------------------------------------------------
-//
+// Save the current settings
 //-----------------------------------------------------------------------------
 //
 bool FileConfig::save(bool force) {
@@ -124,22 +124,33 @@ bool FileConfig::save(bool force) {
 }
 
 //-----------------------------------------------------------------------------
+// Reset the configuration to defaults
+//-----------------------------------------------------------------------------
 //
+bool FileConfig::reset() {
+    _setDefaults(); // sets _dirty flag so the config will be saved in the end of loop()
+    Logger.println(INFO, F("[Config] Config reset to defaults"));
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+// Remove the configuration file
 //-----------------------------------------------------------------------------
 //
 bool FileConfig::remove() {
+
     if (!LittleFS.remove(_fileName)) {
         Logger.println(ERROR, F("[Config] Failed to remove config file"));
         return false;
     }
 
-    _setDefaults();
-    Logger.println(INFO, F("[Config] Config file removed. Config reset to defaults"));
+    _dirty = true; // force the config to be saved in the end of loop()
+    Logger.println(INFO, F("[Config] Config file removed"));
     return true;
 }
 
 //-----------------------------------------------------------------------------
-//
+// Print the file contents
 //-----------------------------------------------------------------------------
 //
 String FileConfig::print() {
@@ -164,7 +175,7 @@ String FileConfig::print() {
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-//
+// Change ADCmin
 //-----------------------------------------------------------------------------
 //
 bool FileConfig::scalerAmin(uint16_t value) {
@@ -189,7 +200,7 @@ bool FileConfig::scalerAmin(uint16_t value) {
 };
 
 //-----------------------------------------------------------------------------
-//
+// Change ADCmax
 //-----------------------------------------------------------------------------
 //
 bool FileConfig::scalerAmax(uint16_t value) {
@@ -215,7 +226,7 @@ bool FileConfig::scalerAmax(uint16_t value) {
 };
 
 //-----------------------------------------------------------------------------
-//
+// Change Pmin
 //-----------------------------------------------------------------------------
 //
 bool FileConfig::scalerPmin(uint16_t value) {
@@ -240,7 +251,7 @@ bool FileConfig::scalerPmin(uint16_t value) {
 };
 
 //-----------------------------------------------------------------------------
-//
+// Change Pmax
 //-----------------------------------------------------------------------------
 //
 bool FileConfig::scalerPmax(uint16_t value) {
@@ -287,7 +298,7 @@ bool FileConfig::filtSamps(uint8_t value) {
 };
 
 //-----------------------------------------------------------------------------
-//
+// Change EMA filter alpha
 //-----------------------------------------------------------------------------
 //
 bool FileConfig::filtAlpha(uint8_t value) {
