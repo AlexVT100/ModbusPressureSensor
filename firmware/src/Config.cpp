@@ -68,12 +68,12 @@ bool FileConfig::load() {
     _config.scalerPmin = doc["scaler"]["Pmin"] | _config_def.scalerPmin;
     _config.scalerPmax = doc["scaler"]["Pmax"] | _config_def.scalerPmax;
 
-    _config.filtSamps = doc["filter"]["Samps"] | _config_def.filtSamps;
-    _config.filtAlpha = doc["filter"]["Alpha"] | _config_def.filtAlpha;
+    _config.filtSamps = doc["filter"]["samps"] | _config_def.filtSamps;
+    _config.filtAlpha = doc["filter"]["alpha"] | _config_def.filtAlpha;
 
-    _config.alertLo = doc["alert"]["Lo"] | _config_def.alertLo;
-    _config.alertHi = doc["alert"]["Hi"] | _config_def.alertHi;
-    _config.alertHyst = doc["alert"]["Hyst"] | _config_def.alertHyst;
+    _config.alertLo = doc["alert"]["lo"] | _config_def.alertLo;
+    _config.alertHi = doc["alert"]["hi"] | _config_def.alertHi;
+    _config.alertHyst = doc["alert"]["hyst"] | _config_def.alertHyst;
 
     Serial.println("[Config] Config file loaded");
     return true;
@@ -102,12 +102,12 @@ bool FileConfig::save(bool force) {
     doc["scaler"]["Pmin"] = _config.scalerPmin;
     doc["scaler"]["Pmax"] = _config.scalerPmax;
 
-    doc["filter"]["Samps"] = _config.filtSamps;
-    doc["filter"]["Alpha"] = _config.filtAlpha;
+    doc["filter"]["samps"] = _config.filtSamps;
+    doc["filter"]["alpha"] = _config.filtAlpha;
 
-    doc["alert"]["Lo"] = _config.alertLo;
-    doc["alert"]["Hi"] = _config.alertHi;
-    doc["alert"]["Hyst"] = _config.alertHyst;
+    doc["alert"]["lo"] = _config.alertLo;
+    doc["alert"]["hi"] = _config.alertHi;
+    doc["alert"]["hyst"] = _config.alertHyst;
 
     // Serialize into the file
     if (serializeJsonPretty(doc, _file) == 0) {
