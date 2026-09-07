@@ -24,8 +24,9 @@ class FileConfig {
         uint16_t scalerPmax = 6245; // Maximum pressure, mbar
 
         // Filters
-        uint8_t filtSamps = 32; // Number of samples in one oversampling cycle
-        uint8_t filtAlpha = 8;  // Pressure EMA filter alpha
+        float kalmanQ = 0.1;  // Kalman Q: Process noise variance
+        float kalmanR = 1.0;  // Kalman R: Measurement noise variance
+        float emaAlpha = 0.1; // Pressure EMA filter alpha
 
         // Pressure alert thresholds
         uint16_t alertLo = scalerPmin; // Low pressure
@@ -53,8 +54,9 @@ class FileConfig {
     inline uint16_t scalerAmax() const { return _config.scalerAmax; }
     inline uint16_t scalerPmin() const { return _config.scalerPmin; }
     inline uint16_t scalerPmax() const { return _config.scalerPmax; }
-    inline uint8_t filtSamps() const { return _config.filtSamps; }
-    inline uint8_t filtAlpha() const { return _config.filtAlpha; }
+    inline float kalmanQ() const { return _config.kalmanQ; }
+    inline float kalmanR() const { return _config.kalmanR; }
+    inline float emaAlpha() const { return _config.emaAlpha; }
     inline uint16_t alertLo() const { return _config.alertLo; };
     inline uint16_t alertHi() const { return _config.alertHi; };
     inline uint16_t alertHyst() const { return _config.alertHyst; };
@@ -65,8 +67,9 @@ class FileConfig {
     bool scalerAmax(uint16_t value);
     bool scalerPmin(uint16_t value);
     bool scalerPmax(uint16_t value);
-    bool filtSamps(uint8_t value);
-    bool filtAlpha(uint8_t value);
+    bool kalmanQ(float value);
+    bool kalmanR(float value);
+    bool emaAlpha(float value);
     bool alertLo(uint16_t value);
     bool alertHi(uint16_t value);
     bool alertHyst(uint8_t value);

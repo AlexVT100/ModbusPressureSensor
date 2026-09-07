@@ -7,12 +7,12 @@
 
 #include "Config.h"
 #include "DebouncedButton.h"
+#include "Filters.h"
 #include "TelnetServer.h"
 #include "TerminalLogger.h"
 
 #include "States.h"
 #include "bitmaps.h"
-#include "functions.h"
 
 //=============================================================================
 // General Settings
@@ -83,6 +83,9 @@ FileConfig Conf;
 // Modbus object
 ModbusHelperClass ModbusHelper;
 
+// Kalman filter
+KalmanFilterClass KalmanFilter;
+
 // Telnet terminal and Logger
 TelnetServer Telnet(8023);
 TerminalLogger Logger(Telnet);
@@ -93,6 +96,7 @@ TerminalLogger Logger(Telnet);
 
 void blinkLEDForever();
 void readSensor();
+int16_t scale(uint16_t value, uint16_t inMin, uint16_t inMax, uint16_t outMin, uint16_t outMax);
 void updateDisplay();
 void drawThrobber(int x, int y, int w, int h);
 
@@ -154,6 +158,9 @@ void setup() {
     // Start the Modbus server and configure the registers
     ModbusHelper.setup();
 
+    // Init the Kalman filter
+    KalmanFilter.init(Conf.kalmanQ(), Conf.kalmanR());
+
     // Switch off the LED
     setLEDOff();
 
@@ -183,6 +190,8 @@ void loop() {
         updateDisplay();
         ModbusHelper.pressure(Sensor.pressure >= 0 ? Sensor.pressure : 0);
         ModbusHelper.status(Sensor.status);
+        ModbusHelper.adcRaw(Sensor.adcValueRaw);
+        ModbusHelper.adc(Sensor.adcValue);
     }
 
     if (Button.wasPressed() || DispState.setOn) {
@@ -202,6 +211,12 @@ void loop() {
     Telnet.loop();
     ModbusHelper.loop();
     Conf.save();
+
+    // Re-init the Kalman fiter if Q and/or R have changed
+    if (KalmanFilter.needsInit()) {
+        KalmanFilter.init(Conf.kalmanQ(), Conf.kalmanR());
+        Logger.println(INFO, F("The Kalman filter re-initialized"));
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -210,16 +225,10 @@ void loop() {
 //
 void readSensor() {
     //
-    // Read the ADC value with oversampling to kill WiFi/OLED noise
+    // Read and filter the ADC value
     //
-    const uint8_t samples = Conf.filtSamps();
-    uint32_t totalRaw = 0;
-
-    for (uint8_t i = 0; i < samples; i++) {
-        totalRaw += analogRead(A0);
-        delay(2); // Allow the ADC input RC-filter impedance to settle
-    }
-    Sensor.adcValue = (totalRaw + samples / 2) / samples;
+    Sensor.adcValueRaw = median_filter(A0);
+    Sensor.adcValue = KalmanFilter.update(Sensor.adcValueRaw);
 
     //
     // Calculate the pressure (mbar)
@@ -231,7 +240,7 @@ void readSensor() {
             Sensor.pressure = 0;
         } else {
             // Pressure is rounded to tens
-            Sensor.pressure = ema_filter(Sensor.pressRaw, Conf.filtAlpha());
+            Sensor.pressure = ema_filter(Sensor.pressRaw, Conf.emaAlpha() * 100);
             Sensor.pressure = ((Sensor.pressure + 5) / 10) * 10;
         }
 
@@ -252,6 +261,29 @@ void readSensor() {
         Sensor.pressure = 0;
         Sensor.status = Status::FAILURE;
     }
+}
+
+//-----------------------------------------------------------------------------
+// A linear value conversion
+//
+// Requires:
+//      inMin != inMax (violation will result in division by zero)
+//      inMax > inMin
+//      outMax >= outMin
+//-----------------------------------------------------------------------------
+//
+int16_t scale(uint16_t value, uint16_t inMin, uint16_t inMax, uint16_t outMin, uint16_t outMax) {
+    const int32_t offset = int32_t(value) - inMin;
+    const int32_t inRange = int32_t(inMax) - inMin;    // always > 0
+    const int32_t outRange = int32_t(outMax) - outMin; // may be negative (inverted mapping)
+
+    const int32_t num = offset * outRange;
+    const int32_t half = inRange / 2;
+
+    // round-to-nearest, ties away from zero
+    const int32_t rounded = (num >= 0) ? (num + half) : (num - half);
+
+    return int16_t(rounded / inRange + outMin);
 }
 
 //-----------------------------------------------------------------------------
@@ -320,7 +352,7 @@ void updateDisplay() {
     // The debug info in the bottom line
     Display.setCursor(0, SCREEN_HEIGHT - 8);
     Display.setTextSize(1);
-    Display.printf("M%d T%d A%04d %04d/%04d", ModbusHelper.connCount(), Telnet.isConnected(), Sensor.adcValue,
+    Display.printf("M%d T%d A%04u %04d/%04d", ModbusHelper.connCount(), Telnet.isConnected(), Sensor.adcValue,
                    Conf.alertLo(), Conf.alertHi());
 
     // Update the throbber

@@ -8,6 +8,7 @@ enum class Status {
 };
 
 struct SensorState {
+    uint adcValueRaw = 0;
     uint adcValue = 0;
     uint pressure = 0;
     int pressRaw = 0;

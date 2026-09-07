@@ -34,6 +34,8 @@ void ModbusHelperClass::setup() {
     // Add registers
     _modbus.addIreg(regAddr::PRESS, 0);
     _modbus.addIreg(regAddr::STATUS, static_cast<uint16_t>(Status::NORMAL));
+    _modbus.addIreg(regAddr::ADC_RAW, 0);
+    _modbus.addIreg(regAddr::ADC, 0);
     _modbus.addHreg(regAddr::LO_THRESH, Conf.alertLo());
     _modbus.addHreg(regAddr::HI_THRESH, Conf.alertHi());
 
