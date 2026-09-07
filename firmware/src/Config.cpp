@@ -68,8 +68,9 @@ bool FileConfig::load() {
     _config.scalerPmin = doc["scaler"]["Pmin"] | _config_def.scalerPmin;
     _config.scalerPmax = doc["scaler"]["Pmax"] | _config_def.scalerPmax;
 
-    _config.filtSamps = doc["filter"]["samps"] | _config_def.filtSamps;
-    _config.filtAlpha = doc["filter"]["alpha"] | _config_def.filtAlpha;
+    _config.kalmanQ = doc["filter"]["q"] | _config_def.kalmanQ;
+    _config.kalmanR = doc["filter"]["r"] | _config_def.kalmanR;
+    _config.emaAlpha = doc["filter"]["alpha"] | _config_def.emaAlpha;
 
     _config.alertLo = doc["alert"]["lo"] | _config_def.alertLo;
     _config.alertHi = doc["alert"]["hi"] | _config_def.alertHi;
@@ -102,8 +103,9 @@ bool FileConfig::save(bool force) {
     doc["scaler"]["Pmin"] = _config.scalerPmin;
     doc["scaler"]["Pmax"] = _config.scalerPmax;
 
-    doc["filter"]["samps"] = _config.filtSamps;
-    doc["filter"]["alpha"] = _config.filtAlpha;
+    doc["filter"]["q"] = _config.kalmanQ;
+    doc["filter"]["r"] = _config.kalmanR;
+    doc["filter"]["alpha"] = _config.emaAlpha;
 
     doc["alert"]["lo"] = _config.alertLo;
     doc["alert"]["hi"] = _config.alertHi;
@@ -276,22 +278,34 @@ bool FileConfig::scalerPmax(uint16_t value) {
 };
 
 //-----------------------------------------------------------------------------
-//
+// Change process noise variance (Q) of Kalman filter 
 //-----------------------------------------------------------------------------
 //
-bool FileConfig::filtSamps(uint8_t value) {
-    if (value == _config.filtSamps) {
-        Logger.printf(WARNING, F("[Config] Number of samples left unchanged (%u)"), value);
+bool FileConfig::kalmanQ(float value) {
+    if (value == _config.kalmanQ) {
+        Logger.printf(WARNING, F("[Config] Kalman Q left unchanged (%f)"), value);
         return false;
     }
 
-    if (value > 64) {
-        Logger.println(ERROR, F("[Config] Number of samples must be between 1 and 64"));
+    _config.kalmanQ = value;
+    Logger.printf(INFO, F("[Config] Kalman Q set to %f"), value);
+
+    _dirty = true;
+    return true;
+};
+
+//-----------------------------------------------------------------------------
+// Change measurement noise variance (R) of Kalman filter
+//-----------------------------------------------------------------------------
+//
+bool FileConfig::kalmanR(float value) {
+    if (value == _config.kalmanR) {
+        Logger.printf(WARNING, F("[Config] Kalman R left unchanged (%f)"), value);
         return false;
     }
 
-    _config.filtSamps = value;
-    Logger.printf(INFO, F("[Config] Number of samples set to %u"), value);
+    _config.kalmanR = value;
+    Logger.printf(INFO, F("[Config] Kalman R set to %f"), value);
 
     _dirty = true;
     return true;
@@ -301,19 +315,19 @@ bool FileConfig::filtSamps(uint8_t value) {
 // Change EMA filter alpha
 //-----------------------------------------------------------------------------
 //
-bool FileConfig::filtAlpha(uint8_t value) {
-    if (value == _config.filtAlpha) {
-        Logger.printf(WARNING, F("[Config] EMA alpha left unchanged (%u)"), value);
+bool FileConfig::emaAlpha(float value) {
+    if (value == _config.emaAlpha) {
+        Logger.printf(WARNING, F("[Config] EMA Alpha left unchanged (%f)"), value);
         return false;
     }
 
-    if (value > 100) {
-        Logger.println(ERROR, F("[Config] EMA alpha must be between 1 and 100"));
+    if (value > 1.0) {
+        Logger.println(ERROR, F("[Config] EMA Alpha must be between 0 and 1"));
         return false;
     }
 
-    _config.filtAlpha = value;
-    Logger.printf(INFO, F("[Config] EMA alpha set to %u"), value);
+    _config.emaAlpha = value;
+    Logger.printf(INFO, F("[Config] EMA Alpha set to %f"), value);
 
     _dirty = true;
     return true;

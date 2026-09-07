@@ -2,9 +2,9 @@
 
 #include "TelnetServer.h"
 #include "Config.h"
+#include "Filters.h"
 #include "States.h"
 #include "WiFiHelper.h"
-#include "functions.h"
 
 #define STATIC
 
@@ -14,6 +14,7 @@ extern DisplayState DispState;
 // extern bool SetDisplayOn;
 extern unsigned long RolloverCount;
 extern FileConfig Conf;
+extern KalmanFilterClass KalmanFilter;
 
 void _banner(OutputInterface *terminal) {
     terminal->println(PROMPT, "\nPressure Sensor " + String(ESP.getChipId(), HEX));
@@ -55,7 +56,6 @@ void TelnetServer::setup() {
     TERM_CMD->addCmd("sensor", "", "Get the sensor readings", cmdSensor);
     TERM_CMD->addCmd("display", "", "Turn on display", cmdDisp);
     TERM_CMD->addCmd("sysinfo", "", "Get the system info", cmdSys);
-    TERM_CMD->addCmd("scale", "adc|press N", "Test the scaler settings", cmdTestScale);
 }
 
 //-----------------------------------------------------------------------------
@@ -204,8 +204,8 @@ STATIC int TelnetServer::_readParam(OutputInterface *terminal, std::initializer_
 //      See the previuos function
 //-----------------------------------------------------------------------------
 //
-STATIC int TelnetServer::_readParam(OutputInterface *terminal, std::initializer_list<const char *> params,
-                                    uint &value) {
+template <typename T>
+STATIC int TelnetServer::_readParam(OutputInterface *terminal, std::initializer_list<const char *> params, T &value) {
     // Process the parameter
     int ci = _readParam(terminal, params);
     if (ci == -1) return ci; // Failed
@@ -218,7 +218,7 @@ STATIC int TelnetServer::_readParam(OutputInterface *terminal, std::initializer_
 }
 
 //-----------------------------------------------------------------------------
-// Read a value from the command
+// Read an unsigned integer value from the command
 //-----------------------------------------------------------------------------
 //
 STATIC bool TelnetServer::_readValue(OutputInterface *terminal, uint &value) {
@@ -240,7 +240,34 @@ STATIC bool TelnetServer::_readValue(OutputInterface *terminal, uint &value) {
     }
 
     // Report the value error
-    terminal->println(ERROR, F("Value must be a positive number"));
+    terminal->println(ERROR, F("Value must be a non-negative integer"));
+    return false;
+}
+
+//-----------------------------------------------------------------------------
+// Read a float value from the command
+//-----------------------------------------------------------------------------
+//
+STATIC bool TelnetServer::_readValue(OutputInterface *terminal, float &value) {
+    // Read the value
+    const char *param = terminal->readParameter();
+    if (param == NULL) {
+        // No value specified
+        value = NAN;
+        return true;
+    }
+
+    // Convert the value to an integer
+    char *endPtr;
+    float svalue = std::strtof(param, &endPtr);
+    if (param != endPtr && svalue >= 0) {
+        // accept only non-negative numbers
+        value = svalue;
+        return true;
+    }
+
+    // Report the value error
+    terminal->println(ERROR, F("Value must be a non-negative float"));
     return false;
 }
 
@@ -285,8 +312,9 @@ STATIC void TelnetServer::cmdConfig(OutputInterface *term) {
             printf(term, INFO, F("   Output (P): %4u...%4u mbar"), Conf.scalerPmin(), Conf.scalerPmax());
             printf(term, INFO, F("      Min ADC: %4u"), Conf.adcMinServ());
             term->println(F("Filters:"));
-            printf(term, INFO, F("  ADC Samples: %u"), Conf.filtSamps());
-            printf(term, INFO, F("    EMA Alpha: %u"), Conf.filtAlpha());
+            printf(term, INFO, F("     Kalman Q: %f"), Conf.kalmanQ());
+            printf(term, INFO, F("     Kalman R: %f"), Conf.kalmanR());
+            printf(term, INFO, F("    EMA Alpha: %f"), Conf.emaAlpha());
             term->println(F("Pressure alerts:"));
             printf(term, INFO, F("          Low: %u mbar"), Conf.alertLo());
             printf(term, INFO, F("         High: %u mbar"), Conf.alertHi());
@@ -415,23 +443,33 @@ STATIC void TelnetServer::cmdScalerPress(OutputInterface *term) {
 //-----------------------------------------------------------------------------
 //
 STATIC void TelnetServer::cmdFilter(OutputInterface *term) {
-    uint value;
-    switch (_readParam(term, {"", "ns", "alpha"}, value)) {
+    float value;
+    switch (_readParam(term, {"", "q", "r", "alpha"}, value)) {
         case 0: // no parameter
-            printf(term, INFO, F("Number of samples is %u"), Conf.filtSamps());
-            printf(term, INFO, F("Pressure EMA alpha is %u"), Conf.filtAlpha());
+            printf(term, INFO, F("Kalman Q is %f"), Conf.kalmanQ());
+            printf(term, INFO, F("Kalman R is %f"), Conf.kalmanR());
+            printf(term, INFO, F("EMA alpha is %f"), Conf.emaAlpha());
             break;
-        case 1: // ns
-            if (value == VAL_UNSET)
-                printf(term, INFO, F("Number of samples is %u"), Conf.filtSamps());
-            else
-                Conf.filtSamps(value);
+        case 1: // q
+            if (std::isnan(value)) {
+                printf(term, INFO, F("Kalman Q is %f"), Conf.kalmanQ());
+            } else {
+                if (Conf.kalmanQ(value)) KalmanFilter.forceInit();
+            }
             break;
-        case 2: // alpha
-            if (value == VAL_UNSET)
-                printf(term, INFO, F("Pressure EMA alpha is %u"), Conf.filtAlpha());
+        case 2: // r
+            if (std::isnan(value)) {
+                printf(term, INFO, F("Kalman R is %f"), Conf.kalmanR());
+            } else {
+                if (Conf.kalmanR(value))
+                KalmanFilter.forceInit();
+            }
+            break;
+        case 3: // alpha
+            if (std::isnan(value))
+                printf(term, INFO, F("EMA alpha is %f"), Conf.emaAlpha());
             else
-                Conf.filtAlpha(value);
+                Conf.emaAlpha(value);
             break;
     }
 
@@ -477,8 +515,8 @@ STATIC void TelnetServer::cmdAlerts(OutputInterface *term) {
 // Display the current settings and  other useful info
 //-----------------------------------------------------------------------------
 //
-//#define STRING(x) #x
-//#define GIT_REVISION "123"
+// #define STRING(x) #x
+// #define GIT_REVISION "123"
 STATIC void TelnetServer::cmdSys(OutputInterface *term) {
     printf(term, INFO, F("  Firmware version: %s"), GIT_REVISION);
     printf(term, INFO, F("        Flash time: %s"), BUILD_TIME);
@@ -488,38 +526,6 @@ STATIC void TelnetServer::cmdSys(OutputInterface *term) {
     printf(term, INFO, F("Heap Fragmentation: %u %%"), ESP.getHeapFragmentation());
     printf(term, INFO, F("            Uptime: %s"), uptime(RolloverCount));
     printf(term, INFO, F("        Reset info: %s"), ESP.getResetInfo().c_str());
-
-    term->prompt();
-}
-
-//-----------------------------------------------------------------------------
-// Convert ADC value to pressure and vice versa with the current scaler parameters
-//-----------------------------------------------------------------------------
-//
-STATIC void TelnetServer::cmdTestScale(OutputInterface *term) {
-    uint value;
-    int res;
-
-    int i = _readParam(term, {"adc", "p"}, value);
-    do {
-        if (i < 0) break; // Command error
-
-        if (value == VAL_UNSET) { // The value is required
-            term->println(ERROR, F("Value cannot be empty"));
-            break;
-        }
-
-        switch (i) {
-            case 0: // adc: forward scaling
-                res = scale(value, Conf.scalerAmin(), Conf.scalerAmax(), Conf.scalerPmin(), Conf.scalerPmax());
-                printf(term, INFO, F("Output pressure is %d"), res, F(" mbar"));
-                break;
-            case 1: // p: backward scaling
-                res = scale(value, Conf.scalerPmin(), Conf.scalerPmax(), Conf.scalerAmin(), Conf.scalerAmax());
-                printf(term, INFO, F("Input ADC value is %d"), res, F(" mbar"));
-                break;
-        }
-    } while (0);
 
     term->prompt();
 }

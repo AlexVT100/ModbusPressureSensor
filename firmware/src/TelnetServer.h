@@ -27,12 +27,14 @@ class TelnetServer : public Terminal {
 
   protected:
     static int _readParam(OutputInterface *terminal, std::initializer_list<const char *> params);
-    static int _readParam(OutputInterface *terminal, std::initializer_list<const char *> params, uint &value);
+    template <typename T> static int _readParam(OutputInterface *terminal, std::initializer_list<const char *> params,
+                                         T &value);
     static bool _readValue(OutputInterface *terminal, uint &value);
+    static bool _readValue(OutputInterface *terminal, float &value);
 
     static void printf(OutputInterface *t, PRINT_TYPES type, const char *fmt, ...);
     static void printf(OutputInterface *t, PRINT_TYPES type, const __FlashStringHelper *fmt, ...);
-    //static void printf(OutputInterface *t, COLOR color, const __FlashStringHelper *fmt, ...);
+    // static void printf(OutputInterface *t, COLOR color, const __FlashStringHelper *fmt, ...);
 
     void cmdExit(OutputInterface *terminal);
     void cmdRestart(OutputInterface *terminal);
@@ -45,5 +47,4 @@ class TelnetServer : public Terminal {
     static void cmdSensor(OutputInterface *terminal);
     static void cmdDisp(OutputInterface *terminal);
     static void cmdSys(OutputInterface *terminal);
-    static void cmdTestScale(OutputInterface *terminal);
 };
