@@ -2,10 +2,16 @@
 
 ## Firmware
 
+### 1.1.1 (2026-09-09)
+* Optimized the telnet server:
+	* Simplfied output of some telnet commands.
+	* Removed duplicated output from the `config` command.
+	* Optimized some command functions.
+
 ### 1.1.0 (2026-09-08)
 * Reworked filtering:
-  * The simple average filter replaced with the median filter
-  * Added the Kalman filter
+  * The simple average filter replaced with the median filter.
+  * Added the Kalman filter.
   * Added two additional Modbus input registers for debugging - 
     the ADC readings after the median filter (raw) and after
 	the Kalman filter (to be scaled).

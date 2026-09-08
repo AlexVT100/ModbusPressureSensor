@@ -51,11 +51,11 @@ void TelnetServer::setup() {
     TERM_CMD->addCmd("min-in", "[N]", "Get/set minimum acceptable ADC value for serviceable sensor", cmdMinADC);
     TERM_CMD->addCmd("scale-in", "[min|max [N]]", "Get/set scaler ADC values (input)", cmdScalerADC);
     TERM_CMD->addCmd("scale-out", "[min|max [N]]", "Get/set scaler pressure values (output)", cmdScalerPress);
-    TERM_CMD->addCmd("filter", "[ns|apha [N]]", "Get/set the filter parameters", cmdFilter);
+    TERM_CMD->addCmd("filter", "[q|r|a [N]]", "Get/set the filter parameters", cmdFilter);
     TERM_CMD->addCmd("alert", "[lo|hi|hyst [N]]", "Get/set pressure alerting thresholds", cmdAlerts);
     TERM_CMD->addCmd("sensor", "", "Get the sensor readings", cmdSensor);
-    TERM_CMD->addCmd("display", "", "Turn on display", cmdDisp);
-    TERM_CMD->addCmd("sysinfo", "", "Get the system info", cmdSys);
+    TERM_CMD->addCmd("disp", "", "Turn on display", cmdDisp);
+    TERM_CMD->addCmd("sys", "", "Get the system info", cmdSys);
 }
 
 //-----------------------------------------------------------------------------
@@ -306,19 +306,6 @@ STATIC void TelnetServer::cmdConfig(OutputInterface *term) {
         case 0: // no parameter
             term->println(Conf.print());
             term->println();
-
-            term->println(F("Scaling parameters:"));
-            printf(term, INFO, F("  Input (ADC): %4u...%4u"), Conf.scalerAmin(), Conf.scalerAmax());
-            printf(term, INFO, F("   Output (P): %4u...%4u mbar"), Conf.scalerPmin(), Conf.scalerPmax());
-            printf(term, INFO, F("      Min ADC: %4u"), Conf.adcMinServ());
-            term->println(F("Filters:"));
-            printf(term, INFO, F("     Kalman Q: %f"), Conf.kalmanQ());
-            printf(term, INFO, F("     Kalman R: %f"), Conf.kalmanR());
-            printf(term, INFO, F("    EMA Alpha: %f"), Conf.emaAlpha());
-            term->println(F("Pressure alerts:"));
-            printf(term, INFO, F("          Low: %u mbar"), Conf.alertLo());
-            printf(term, INFO, F("         High: %u mbar"), Conf.alertHi());
-            printf(term, INFO, F("   Hysteresis: %u mbar"), Conf.alertHyst());
             break;
         case 1: // save
             Conf.save(true);
@@ -364,11 +351,9 @@ STATIC void TelnetServer::cmdMinADC(OutputInterface *term) {
     if (!_readValue(term, value)) return;
 
     if (value == VAL_UNSET)
-        printf(term, INFO, F("ADCMinServ is %u"), Conf.adcMinServ());
-    else if (Conf.adcMinServ(value))
-        printf(term, INFO, F("ADCMinServ set to %u"), Conf.adcMinServ());
+        printf(term, INFO, F("AminServ: %u"), Conf.adcMinServ());
     else
-        term->println(WARNING, F("ADCMinServ value left unchanged"));
+        Conf.adcMinServ(value);
 
     term->prompt();
 }
@@ -382,8 +367,8 @@ STATIC void TelnetServer::cmdScalerADC(OutputInterface *term) {
 
     switch (_readParam(term, {"", "min", "max"}, value)) {
         case 0: // no parameter
-            printf(term, INFO, F("Amin is %u"), Conf.scalerAmin());
-            printf(term, INFO, F("Amax is %u"), Conf.scalerAmax());
+            printf(term, INFO, F("Amin: %u"), Conf.scalerAmin());
+            printf(term, INFO, F("Amax: %u"), Conf.scalerAmax());
             break;
         case 1: // min
             if (value == VAL_UNSET)
@@ -410,28 +395,20 @@ STATIC void TelnetServer::cmdScalerPress(OutputInterface *term) {
     uint value;
     switch (_readParam(term, {"", "min", "max"}, value)) {
         case 0: // no parameter
-            printf(term, INFO, F("Pmin is %u mbar"), Conf.scalerPmin());
-            printf(term, INFO, F("Pmax is %u mbar"), Conf.scalerPmax());
+            printf(term, INFO, F("Pmin: %u mbar"), Conf.scalerPmin());
+            printf(term, INFO, F("Pmax: %u mbar"), Conf.scalerPmax());
             break;
         case 1: // min
-            if (value == VAL_UNSET) {
-                printf(term, INFO, F("Pmin is %u mbar"), Conf.scalerPmin());
-                break;
-            }
-            if (Conf.scalerPmin(value))
-                printf(term, INFO, F("Pmin set to %u mbar"), Conf.scalerPmin());
+            if (value == VAL_UNSET)
+                printf(term, INFO, F("Pmin: %u mbar"), Conf.scalerPmin());
             else
-                term->println(WARNING, F("Pmin left unchanged"));
+                Conf.scalerPmin(value);
             break;
         case 2: // max
-            if (value == VAL_UNSET) {
-                printf(term, INFO, F("Pmax is %u mbar"), Conf.scalerPmax());
-                break;
-            }
-            if (Conf.scalerPmax(value))
-                printf(term, INFO, F("Pmax set to %u mbar"), Conf.scalerPmax());
+            if (value == VAL_UNSET)
+                printf(term, INFO, F("Pmax: %u mbar"), Conf.scalerPmax());
             else
-                term->println(WARNING, F("Pmax left unchanged"));
+                Conf.scalerPmax(value);
             break;
     }
 
@@ -444,30 +421,29 @@ STATIC void TelnetServer::cmdScalerPress(OutputInterface *term) {
 //
 STATIC void TelnetServer::cmdFilter(OutputInterface *term) {
     float value;
-    switch (_readParam(term, {"", "q", "r", "alpha"}, value)) {
+    switch (_readParam(term, {"", "q", "r", "a"}, value)) {
         case 0: // no parameter
-            printf(term, INFO, F("Kalman Q is %f"), Conf.kalmanQ());
-            printf(term, INFO, F("Kalman R is %f"), Conf.kalmanR());
-            printf(term, INFO, F("EMA alpha is %f"), Conf.emaAlpha());
+            printf(term, INFO, F("Kalman Q: %f"), Conf.kalmanQ());
+            printf(term, INFO, F("Kalman R: is %f"), Conf.kalmanR());
+            printf(term, INFO, F("EMA alpha: %f"), Conf.emaAlpha());
             break;
         case 1: // q
             if (std::isnan(value)) {
-                printf(term, INFO, F("Kalman Q is %f"), Conf.kalmanQ());
+                printf(term, INFO, F("Kalman Q: %f"), Conf.kalmanQ());
             } else {
                 if (Conf.kalmanQ(value)) KalmanFilter.forceInit();
             }
             break;
         case 2: // r
             if (std::isnan(value)) {
-                printf(term, INFO, F("Kalman R is %f"), Conf.kalmanR());
+                printf(term, INFO, F("Kalman R: %f"), Conf.kalmanR());
             } else {
-                if (Conf.kalmanR(value))
-                KalmanFilter.forceInit();
+                if (Conf.kalmanR(value)) KalmanFilter.forceInit();
             }
             break;
-        case 3: // alpha
+        case 3: // a
             if (std::isnan(value))
-                printf(term, INFO, F("EMA alpha is %f"), Conf.emaAlpha());
+                printf(term, INFO, F("EMA alpha: %f"), Conf.emaAlpha());
             else
                 Conf.emaAlpha(value);
             break;
