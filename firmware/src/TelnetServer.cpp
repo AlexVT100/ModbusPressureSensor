@@ -480,8 +480,7 @@ STATIC void TelnetServer::cmdAlerts(OutputInterface *term) {
 // #define STRING(x) #x
 // #define GIT_REVISION "123"
 STATIC void TelnetServer::cmdSys(OutputInterface *term) {
-    printf(term, INFO, F("  Firmware version: %s"), GIT_REVISION);
-    printf(term, INFO, F("        Flash time: %s"), BUILD_TIME);
+    printf(term, INFO, F("        Flash time: %s %s"), __DATE__, __TIME__);
     printf(term, INFO, F("           Chip ID: %X"), ESP.getChipId());
     printf(term, INFO, F("  Flash chip speed: %u MHz"), ESP.getFlashChipSpeed() / 1000000);
     printf(term, INFO, F("    Free heap size: %u bytes"), ESP.getFreeHeap());
