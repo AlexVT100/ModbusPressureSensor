@@ -21,7 +21,8 @@ void _banner(OutputInterface *terminal) {
 }
 
 TelnetServer::TelnetServer(uint port) :
-    Terminal(&_client), _server(port) {
+    Terminal(&_client),
+    _server(port) {
     _cmdExitFunc = [this](OutputInterface *terminal) { return this->cmdExit(terminal); };
     _cmdRestartFunc = [this](OutputInterface *terminal) { return this->cmdRestart(terminal); };
 }
@@ -49,8 +50,7 @@ void TelnetServer::setup() {
     TERM_CMD->addCmd("restart", "", "Restart the device", _cmdRestartFunc);
     TERM_CMD->addCmd("config", "[save|reset|remove]", "Show/save/reset/remove config file", cmdConfig);
     TERM_CMD->addCmd("min-in", "[N]", "Get/set minimum acceptable ADC value for serviceable sensor", cmdMinADC);
-    TERM_CMD->addCmd("scale-in", "[min|max [N]]", "Get/set scaler ADC values (input)", cmdScalerADC);
-    TERM_CMD->addCmd("scale-out", "[min|max [N]]", "Get/set scaler pressure values (output)", cmdScalerPress);
+    TERM_CMD->addCmd("scaler", "[amin|amax|pmin|pmax [N]]", "Get/set scaler values", cmdScaler);
     TERM_CMD->addCmd("filter", "[q|r|a [N]]", "Get/set the filter parameters", cmdFilter);
     TERM_CMD->addCmd("alert", "[lo|hi|hyst [N]]", "Get/set pressure alerting thresholds", cmdAlerts);
     TERM_CMD->addCmd("sensor", "", "Get the sensor readings", cmdSensor);
@@ -359,52 +359,38 @@ STATIC void TelnetServer::cmdMinADC(OutputInterface *term) {
 }
 
 //-----------------------------------------------------------------------------
-// Show/change the input ADC values for the scaler
+// Show/change the scaler input ADC and output pressure values
 //-----------------------------------------------------------------------------
 //
-STATIC void TelnetServer::cmdScalerADC(OutputInterface *term) {
+STATIC void TelnetServer::cmdScaler(OutputInterface *term) {
     uint value;
 
-    switch (_readParam(term, {"", "min", "max"}, value)) {
+    switch (_readParam(term, {"", "amin", "amax", "pmin", "pmax"}, value)) {
         case 0: // no parameter
             printf(term, INFO, F("Amin: %u"), Conf.scalerAmin());
             printf(term, INFO, F("Amax: %u"), Conf.scalerAmax());
-            break;
-        case 1: // min
-            if (value == VAL_UNSET)
-                printf(term, INFO, F("Amin is %u"), Conf.scalerAmin());
-            else
-                Conf.scalerAmin(value);
-            break;
-        case 2: // max
-            if (value == VAL_UNSET)
-                printf(term, INFO, F("Amax is %u"), Conf.scalerAmax());
-            else
-                Conf.scalerAmax(value);
-            break;
-    }
-
-    term->prompt();
-}
-
-//-----------------------------------------------------------------------------
-// Show/change the output pressure values for the scaler
-//-----------------------------------------------------------------------------
-//
-STATIC void TelnetServer::cmdScalerPress(OutputInterface *term) {
-    uint value;
-    switch (_readParam(term, {"", "min", "max"}, value)) {
-        case 0: // no parameter
             printf(term, INFO, F("Pmin: %u mbar"), Conf.scalerPmin());
             printf(term, INFO, F("Pmax: %u mbar"), Conf.scalerPmax());
             break;
-        case 1: // min
+        case 1: // amin
+            if (value == VAL_UNSET)
+                printf(term, INFO, F("Amin: %u"), Conf.scalerAmin());
+            else
+                Conf.scalerAmin(value);
+            break;
+        case 2: // amax
+            if (value == VAL_UNSET)
+                printf(term, INFO, F("Amax: %u"), Conf.scalerAmax());
+            else
+                Conf.scalerAmax(value);
+            break;
+        case 3: // pmin
             if (value == VAL_UNSET)
                 printf(term, INFO, F("Pmin: %u mbar"), Conf.scalerPmin());
             else
                 Conf.scalerPmin(value);
             break;
-        case 2: // max
+        case 4: // pmax
             if (value == VAL_UNSET)
                 printf(term, INFO, F("Pmax: %u mbar"), Conf.scalerPmax());
             else

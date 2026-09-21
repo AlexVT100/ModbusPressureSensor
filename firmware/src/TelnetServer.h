@@ -40,8 +40,7 @@ class TelnetServer : public Terminal {
     void cmdRestart(OutputInterface *terminal);
     static void cmdConfig(OutputInterface *terminal);
     static void cmdMinADC(OutputInterface *terminal);
-    static void cmdScalerADC(OutputInterface *terminal);
-    static void cmdScalerPress(OutputInterface *terminal);
+    static void cmdScaler(OutputInterface *terminal);
     static void cmdFilter(OutputInterface *terminal);
     static void cmdAlerts(OutputInterface *terminal);
     static void cmdSensor(OutputInterface *terminal);
