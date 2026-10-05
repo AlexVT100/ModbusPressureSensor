@@ -50,9 +50,12 @@
 // Global variables and containers
 //=============================================================================
 
+// WiFi
+static constexpr unsigned WiFiConnTimeout = 300; // WiFi connection timeout, s
+
 // Timers
-static constexpr ulong SensorInterval = 500;    // Sensor polling frequency
-static constexpr ulong DisplayInterval = 60000; // Display off timeout
+static constexpr ulong SensorInterval = 500;    // Sensor polling interval, ms
+static constexpr ulong DisplayInterval = 60000; // Display off timeout, ms
 
 // millis() rollover counter for full uptime counting
 ulong RolloverCount = 0;
@@ -133,19 +136,17 @@ void setup() {
     Display.setTextColor(SSD1306_WHITE);
 
     // Init the WIFI
-    if (digitalRead(BUTTON_PIN) == LOW) {
+    if (digitalRead(BUTTON_PIN) == LOW || WiFi.SSID().length() == 0) {
+        // The button is pressed or no saved credentials -- enter WiFi configuration mode
         Display.clearDisplay();
         Display.setCursor(0, 0);
-        Display.println("Button pressed");
+        Display.println(WiFi.SSID().length() == 0 ? "No WiFi credentials" : "Button pressed");
         Display.println("Starting WiFi Manager");
         Display.display();
         delay(2000);
         WiFiHelper.startWiFiManager();
     } else {
-        if (!WiFiHelper.connectToSavedWiFi()) {
-            delay(2000);
-            WiFiHelper.startWiFiManager();
-        }
+        WiFiHelper.connectToSavedWiFi(WiFiConnTimeout);
     }
 
     // Initialize the telnet server and te logger
