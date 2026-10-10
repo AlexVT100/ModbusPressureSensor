@@ -9,8 +9,10 @@ AllowShortEnumsOnASingleLine: false
 AllowShortLoopsOnASingleLine: true
 AllowShortFunctionsOnASingleLine: true
 AllowShortIfStatementsOnASingleLine: WithoutElse
+AlignConsecutiveAssignments: Consecutive  #AcrossComments
+AlignConsecutiveDeclarations: Consecutive #AcrossComments
 NamespaceIndentation: All
 IndentCaseLabels: true
 BreakTemplateDeclarations: Leave
-PackConstructorInitializers: NextLineOnly
+PackConstructorInitializers: Never
 BreakConstructorInitializers: AfterColon

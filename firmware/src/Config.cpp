@@ -1,4 +1,5 @@
 #include "Config.h"
+#include "filters/kalman.h"
 #include "TerminalLogger.h"
 
 extern TerminalLogger Logger;
@@ -278,12 +279,18 @@ bool FileConfig::scalerPmax(uint16_t value) {
 };
 
 //-----------------------------------------------------------------------------
-// Change process noise variance (Q) of Kalman filter 
+// Change process noise variance (Q) of Kalman filter
 //-----------------------------------------------------------------------------
 //
 bool FileConfig::kalmanQ(float value) {
     if (value == _config.kalmanQ) {
         Logger.printf(WARNING, F("[Config] Kalman Q left unchanged (%f)"), value);
+        return false;
+    }
+
+    if (value < KalmanFilterClass::MIN_COV || value > KalmanFilterClass::MAX_COV) {
+        Logger.printf(ERROR, F("[Config] Kalman Q must be between %f and %f (inclusive)"), KalmanFilterClass::MIN_COV,
+                      KalmanFilterClass::MAX_COV);
         return false;
     }
 
@@ -301,6 +308,12 @@ bool FileConfig::kalmanQ(float value) {
 bool FileConfig::kalmanR(float value) {
     if (value == _config.kalmanR) {
         Logger.printf(WARNING, F("[Config] Kalman R left unchanged (%f)"), value);
+        return false;
+    }
+
+    if (value < KalmanFilterClass::MIN_COV || value > KalmanFilterClass::MAX_COV) {
+        Logger.printf(ERROR, F("[Config] Kalman R must be between %f and %f (inclusive)"), KalmanFilterClass::MIN_COV,
+                      KalmanFilterClass::MAX_COV);
         return false;
     }
 

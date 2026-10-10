@@ -2,7 +2,7 @@
 
 #include "TelnetServer.h"
 #include "Config.h"
-#include "Filters.h"
+#include "filters/kalman.h"
 #include "States.h"
 #include "WiFiHelper.h"
 
@@ -410,21 +410,21 @@ STATIC void TelnetServer::cmdFilter(OutputInterface *term) {
     switch (_readParam(term, {"", "q", "r", "a"}, value)) {
         case 0: // no parameter
             printf(term, INFO, F("Kalman Q: %f"), Conf.kalmanQ());
-            printf(term, INFO, F("Kalman R: is %f"), Conf.kalmanR());
+            printf(term, INFO, F("Kalman R: %f"), Conf.kalmanR());
             printf(term, INFO, F("EMA alpha: %f"), Conf.emaAlpha());
             break;
         case 1: // q
             if (std::isnan(value)) {
                 printf(term, INFO, F("Kalman Q: %f"), Conf.kalmanQ());
             } else {
-                if (Conf.kalmanQ(value)) KalmanFilter.forceInit();
+                if (Conf.kalmanQ(value)) KalmanFilter.covsChanged(true);
             }
             break;
         case 2: // r
             if (std::isnan(value)) {
                 printf(term, INFO, F("Kalman R: %f"), Conf.kalmanR());
             } else {
-                if (Conf.kalmanR(value)) KalmanFilter.forceInit();
+                if (Conf.kalmanR(value)) KalmanFilter.covsChanged(true);
             }
             break;
         case 3: // a

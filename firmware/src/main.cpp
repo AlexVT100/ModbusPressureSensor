@@ -7,9 +7,13 @@
 
 #include "Config.h"
 #include "DebouncedButton.h"
-#include "Filters.h"
 #include "TelnetServer.h"
 #include "TerminalLogger.h"
+
+#include "scaler/scaler.h"
+#include "filters/ema.h"
+#include "filters/kalman.h"
+#include "filters/median.h"
 
 #include "States.h"
 #include "bitmaps.h"
@@ -45,6 +49,9 @@
 
 // The button pin. D5, D6 and D7 are available
 #define BUTTON_PIN D7
+
+// The size of an ADC samples buffer for oversampling
+constexpr size_t MEDIAN_SIZE = 9;
 
 //=============================================================================
 // Global variables and containers
@@ -90,18 +97,18 @@ ModbusHelperClass ModbusHelper;
 KalmanFilterClass KalmanFilter;
 
 // Telnet terminal and Logger
-TelnetServer Telnet(8023);
+TelnetServer   Telnet(8023);
 TerminalLogger Logger(Telnet);
 
 //=============================================================================
 // Forward declarations for the local functions
 //=============================================================================
 
-void blinkLEDForever();
-void readSensor();
-int16_t scale(uint16_t value, uint16_t inMin, uint16_t inMax, uint16_t outMin, uint16_t outMax);
-void updateDisplay();
-void drawThrobber(int x, int y, int w, int h);
+void      blinkLEDForever();
+void      readSensor();
+uint32_t *readSamples(uint8_t pin);
+void      updateDisplay();
+void      drawThrobber(int x, int y, int w, int h);
 
 inline void setLEDOn() { digitalWrite(LED_BUILTIN, LOW); }
 inline void setLEDOff() { digitalWrite(LED_BUILTIN, HIGH); }
@@ -160,7 +167,7 @@ void setup() {
     ModbusHelper.setup();
 
     // Init the Kalman filter
-    KalmanFilter.init(Conf.kalmanQ(), Conf.kalmanR());
+    KalmanFilter.setCovs(Conf.kalmanQ(), Conf.kalmanR());
 
     // Switch off the LED
     setLEDOff();
@@ -214,9 +221,11 @@ void loop() {
     Conf.save();
 
     // Re-init the Kalman fiter if Q and/or R have changed
-    if (KalmanFilter.needsInit()) {
-        KalmanFilter.init(Conf.kalmanQ(), Conf.kalmanR());
-        Logger.println(INFO, F("The Kalman filter re-initialized"));
+    if (KalmanFilter.covsChanged()) {
+        if (KalmanFilter.setCovs(Conf.kalmanQ(), Conf.kalmanR()))
+            Logger.println(INFO, F("Kalman covariance values are updated"));
+        else
+            Logger.println(ERROR, F("One or more Kalman filter covariance values are negative"));
     }
 }
 
@@ -228,8 +237,8 @@ void readSensor() {
     //
     // Read and filter the ADC value
     //
-    Sensor.adcValueRaw = median_filter(A0);
-    Sensor.adcValue = KalmanFilter.update(Sensor.adcValueRaw);
+    Sensor.adcValueRaw = median_filter(readSamples(A0), MEDIAN_SIZE);
+    Sensor.adcValue    = KalmanFilter.update(Sensor.adcValueRaw);
 
     //
     // Calculate the pressure (mbar)
@@ -260,31 +269,28 @@ void readSensor() {
         }
     } else {
         Sensor.pressure = 0;
-        Sensor.status = Status::FAILURE;
+        Sensor.status   = Status::FAILURE;
     }
 }
 
 //-----------------------------------------------------------------------------
-// A linear value conversion
-//
-// Requires:
-//      inMin != inMax (violation will result in division by zero)
-//      inMax > inMin
-//      outMax >= outMin
+// Read MEDIAN_SIZE of samples into the static buffer
 //-----------------------------------------------------------------------------
 //
-int16_t scale(uint16_t value, uint16_t inMin, uint16_t inMax, uint16_t outMin, uint16_t outMax) {
-    const int32_t offset = int32_t(value) - inMin;
-    const int32_t inRange = int32_t(inMax) - inMin;    // always > 0
-    const int32_t outRange = int32_t(outMax) - outMin; // may be negative (inverted mapping)
+uint32_t *readSamples(uint8_t pin) {
+    static uint32_t buf[MEDIAN_SIZE];
 
-    const int32_t num = offset * outRange;
-    const int32_t half = inRange / 2;
+    // Ignore the first reading in a series as it usually stands out
+    // of the rest (an ADC peculiarity? an RC-filter feature?)
+    analogRead(pin);
 
-    // round-to-nearest, ties away from zero
-    const int32_t rounded = (num >= 0) ? (num + half) : (num - half);
+    // Collect the samples
+    for (size_t i = 0; i < MEDIAN_SIZE; i++) {
+        delay(2);
+        buf[i] = analogRead(pin);
+    }
 
-    return int16_t(rounded / inRange + outMin);
+    return buf;
 }
 
 //-----------------------------------------------------------------------------
